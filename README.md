@@ -11,7 +11,7 @@
 <img src="doc/lwgsh.jpg" height="129">
 
 上海宁可以扫码关注我的微信公众号“一择刚度”
-<img src="doc/yzgd.jpg" height="129">
+<img src="doc/yzgd.png" height="129">
 
 * [引言](#引言)
 * [系统要求](##系统要求)
