@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""dongbei语言执行器
+"""shanghai语言执行器
 
 用法：
-    dongbei.py 源程序文件名...
+    python shanghai.py 源程序文件名...
 """
 
 import io
 import re
 import sys
 
-KW_APPEND = '来了个'
 KW_BANG = '！'
-KW_BECOME = '装'
-KW_BEGIN = '开整：'
-KW_BREAK = '尥蹶子'
-KW_CALL = '整'
-KW_CHECK = '寻思：'
+KW_BECOME = '毛估估是'
+KW_BEGIN = '一道组特：'
+KW_CALL = '白相'
+KW_CHECK = '轧苗头：'
 KW_CLOSE_PAREN = '）'
 KW_CLOSE_PAREN_NARROW = ')'
 KW_CLOSE_QUOTE = '”'
@@ -25,55 +23,45 @@ KW_COLON = '：'
 KW_COMMA = '，'
 KW_COMMA_NARROW = ','
 KW_COMPARE = '比'
-KW_COMPARE_WITH = '跟'
+KW_COMPARE_WITH = '帮'
 KW_CONCAT = '、'
-KW_CONTINUE = '接着磨叽'
-KW_DEC = '稍稍'
-KW_DEC_BY = '稍'
-KW_DELETE = '削'
+KW_DEC = '混腔势'
+KW_DEC_BY = '混'
+KW_DELETE = '色特'
 KW_DIVIDE_BY = '除以'
-KW_ELSE = '要不行咧就'
-KW_END = '整完了'
-KW_END_LOOP = '磨叽完了'
-KW_EQUAL = '一样一样的'
+KW_ELSE = '勿来赛就'
+KW_END = '组好了'
+KW_END_LOOP = '搞好了'
+KW_EQUAL = '一色一样'
 KW_FROM = '从'
-KW_FUNC_DEF = '咋整：'
-KW_GREATER = '大'
-KW_IMPORT = '翠花，上'
-KW_IN = '在'
-KW_INC = '走走'
-KW_INC_BY = '走'
-KW_INDEX = '的老'
-KW_1_INFINITE_LOOP = '从一而终磨叽：'
-KW_1_INFINITE_LOOP_EGG = '在苹果总部磨叽：'  # 彩蛋
-KW_INTEGER_DIVIDE_BY = '齐整整地除以'
-KW_IS_LIST = '都是活雷锋'
-KW_IS_NONE = '啥也不是'
-KW_IS_VAR = '是活雷锋'
-KW_LAST = '幺'
-KW_LENGTH = '有几个坑'
-KW_LESS = '小'
-KW_LOOP = '磨叽：'
+KW_FUNC_DEF = '哪能组：'
+KW_GREATER = '老卵'
+KW_IMPORT = '阿庆，上'
+KW_INC = '扎台型'
+KW_INC_BY = '扎'
+KW_INTEGER_DIVIDE_BY = '除以得毕挺'
+KW_IS_NONE = '脑子瓦特了'
+KW_IS_VAR = '是则赤佬'
+KW_LESS = '推板'
+KW_LOOP = '搞七捻三：'
 KW_MINUS = '减'
-KW_NOT_EQUAL = '不是一样一样的'
+KW_NOT_EQUAL = '伐大一样'
 KW_OPEN_PAREN = '（'
 KW_OPEN_PAREN_NARROW = '('
 KW_OPEN_QUOTE = '“'
 KW_PERIOD = '。'
 KW_PLUS = '加'
-KW_RETURN = '滚犊子吧'
-KW_SAY = '唠唠'
-KW_STEP = '步'
-KW_THEN = '？要行咧就'
+KW_RETURN = '再会'
+KW_SAY = '嘎讪胡'
+KW_STEP = '趟'
+KW_THEN = '？要来赛就'
 KW_TIMES = '乘'
 KW_TO = '到'
 
 KEYWORDS = (
-    KW_APPEND,
     KW_BANG,
     KW_BECOME,
     KW_BEGIN,
-    KW_BREAK,
     KW_CHECK,
     KW_CLOSE_PAREN,
     KW_CLOSE_PAREN_NARROW,
@@ -84,32 +72,24 @@ KEYWORDS = (
     KW_COMPARE,
     KW_COMPARE_WITH,
     KW_CONCAT,
-    KW_CONTINUE,
     KW_DEC,
     KW_DEC_BY,
     KW_DELETE,
+    KW_INTEGER_DIVIDE_BY,
     KW_DIVIDE_BY,
     KW_ELSE,
-    KW_END,   # must match 整完了 before matching 整
-    KW_CALL,  # 整
+    KW_END,
+    KW_CALL,
     KW_END_LOOP,
     KW_EQUAL,
-    KW_1_INFINITE_LOOP,  # must match 从一而终磨叽 before 从
     KW_FROM,
     KW_FUNC_DEF,
     KW_GREATER,
     KW_IMPORT,
-    KW_1_INFINITE_LOOP_EGG,  # must match 在苹果总部磨叽 before 在
-    KW_IN,
     KW_INC,
     KW_INC_BY,
-    KW_INDEX,
-    KW_INTEGER_DIVIDE_BY,
-    KW_IS_LIST,
     KW_IS_NONE,
     KW_IS_VAR,
-    KW_LAST,
-    KW_LENGTH,
     KW_LESS,
     KW_LOOP,
     KW_MINUS,
@@ -143,22 +123,16 @@ TK_INTEGER_LITERAL = 'INTEGER'
 TK_CHAR = 'CHAR'
 
 # Statements.
-STMT_APPEND = 'APPEND'
 STMT_ASSIGN = 'ASSIGN'
-STMT_BREAK = 'BREAK'
 STMT_CALL = 'CALL'
 STMT_COMPOUND = 'COMPOUND'
 STMT_CONDITIONAL = 'CONDITIONAL'
-STMT_CONTINUE = 'CONTINUE'
 STMT_DEC_BY = 'DEC_BY'
 STMT_DELETE = 'DELETE'
 STMT_FUNC_DEF = 'FUNC_DEF'
 STMT_IMPORT = 'IMPORT'
 STMT_INC_BY = 'INC_BY'
-STMT_INFINITE_LOOP = 'INFINITE_LOOP'
-STMT_LIST_VAR_DECL = 'LIST_VAR_DECL'
 STMT_LOOP = 'LOOP'
-STMT_RANGE_LOOP = 'RANGE_LOOP'
 STMT_RETURN = 'RETURN'
 STMT_SAY = 'SAY'
 STMT_VAR_DECL = 'VAR_DECL'
@@ -206,12 +180,12 @@ class Expr:
     """Translates this expression to Python."""
     raise Exception('%s must implement ToPython().' % (type(self),))
 
-def _dongbei_str(value):
-  """Converts a value to its dongbei string."""
+def _shanghai_str(value):
+  """Converts a value to its shanghai string."""
   if value is None:
-    return '啥也不是'
+    return '脑子瓦特了'
   if type(value) == bool:
-    return '对' if value else '错'
+    return '对额' if value else '勿对'
   return str(value)
 
 class ConcatExpr(Expr):
@@ -225,35 +199,8 @@ class ConcatExpr(Expr):
     return self.exprs == other.exprs
 
   def ToPython(self):
-    return ' + '.join('_dongbei_str(%s)' % (
+    return ' + '.join('_shanghai_str(%s)' % (
         expr.ToPython(),) for expr in self.exprs)
-
-class LengthExpr(Expr):
-  def __init__(self, expr):
-    self.expr = expr
-
-  def __str__(self):
-    return f'LENGTH<{self.expr}>'
-
-  def Equals(self, other):
-    return self.expr == other.expr
-
-  def ToPython(self):
-    return f'len({self.expr.ToPython()})'
-
-class IndexExpr(Expr):
-  def __init__(self, list_expr, index_expr):
-    self.list_expr = list_expr
-    self.index_expr = index_expr
-
-  def __str__(self):
-    return f'INDEX_EXPR<{self.list_expr}, {self.index_expr}>'
-
-  def Equals(self, other):
-    return self.list_expr == other.list_expr and self.index_expr == other.index_expr
-
-  def ToPython(self):
-    return f'({self.list_expr.ToPython()})[({self.index_expr.ToPython()}) - 1]'
 
 ARITHMETIC_OPERATION_TO_PYTHON = {
     KW_PLUS: '+',
@@ -351,7 +298,7 @@ class CallExpr(Expr):
         GetPythonVarName(self.func),
         ', '.join(arg.ToPython() for arg in self.args))
 
-# Maps a dongbei comparison keyword to the Python version.
+# Maps a shanghai comparison keyword to the Python version.
 COMPARISON_KEYWORD_TO_PYTHON = {
     KW_GREATER: '>',
     KW_LESS: '<',
@@ -414,7 +361,7 @@ def TokenizeStringLiteralAndRest(code):
   yield Token(TK_STRING_LITERAL, code[:close_quote_pos])
   yield Keyword(KW_CLOSE_QUOTE)
   for tk in BasicTokenize(code[close_quote_pos + len(KW_CLOSE_QUOTE):]):
-    yield tk    
+    yield tk
 
 def SkipWhitespaceAndComment(code):
   while True:
@@ -448,7 +395,7 @@ def BasicTokenize(code):
     for tk in BasicTokenize(code[len(m.group(1)):]):
       yield tk
     return
-    
+
   # Try to parse a keyword at the beginning of the code.
   for keyword in KEYWORDS:
     kw, remaining_code = TryParseKeyword(keyword, code)
@@ -467,16 +414,14 @@ def BasicTokenize(code):
   yield Token(TK_CHAR, code[0])
   for tk in BasicTokenize(code[1:]):
     yield tk
-  
+
 
 CHINESE_DIGITS = {
     '零': 0,
     '一': 1,
     '二': 2,
-    '俩': 2,
     '两': 2,
     '三': 3,
-    '仨': 3,
     '四': 4,
     '五': 5,
     '六': 6,
@@ -484,6 +429,18 @@ CHINESE_DIGITS = {
     '八': 8,
     '九': 9,
     '十': 10,
+    '灵': 0,
+    '耶': 1,
+    '尼': 2,
+    '良': 2,
+    '赛': 3,
+    '思': 4,
+    '恩': 5,
+    '咯': 6,
+    '且': 7,
+    '吧': 8,
+    '就': 9,
+    '色': 10,
     }
 
 def ParseInteger(str):
@@ -494,7 +451,7 @@ def ParseInteger(str):
     if str.startswith(chinese_digit):
       return (value, str[len(chinese_digit):])
   return (None, str)
-    
+
 def ParseChars(chars):
   integer, rest = ParseInteger(chars)
   if integer is not None:
@@ -524,7 +481,7 @@ def Tokenize(code):
       chars = ''
   for tk in ParseChars(chars):
     yield tk
-    
+
 vars = {}  # Maps Chinese identifier to generated identifier.
 def GetPythonVarName(var):
   if re.match(r'[_a-zA-Z]', var):
@@ -552,7 +509,7 @@ def ConsumeTokenType(tk_type, tokens):
   if tk is None:
     sys.exit('期望 %s，实际是 %s' % (tk_type, tokens[0]))
   return tk, tokens
-    
+
 def TryConsumeToken(token, tokens):
   if not tokens:
     return (None, tokens)
@@ -579,22 +536,21 @@ def ConsumeKeyword(keyword, tokens):
 #   Expr ::= NonConcatExpr |
 #            Expr、NonConcatExpr
 #   NonConcatExpr ::= ComparisonExpr | ArithmeticExpr
-#   ComparisonExpr ::= ArithmeticExpr 比 ArithmeticExpr 大 |
-#                      ArithmeticExpr 比 ArithmeticExpr 小 |
-#                      ArithmeticExpr 跟 ArithmeticExpr 一样一样的 |
-#                      ArithmeticExpr 跟 ArithmeticExpr 不是一样一样的
+#   ComparisonExpr ::= ArithmeticExpr 比 ArithmeticExpr 老卵 |
+#                      ArithmeticExpr 比 ArithmeticExpr 推板 |
+#                      ArithmeticExpr 帮 ArithmeticExpr 一色一样 |
+#                      ArithmeticExpr 帮 ArithmeticExpr 伐大一样
 #   ArithmeticExpr ::= TermExpr |
 #                      ArithmeticExpr 加 TermExpr |
 #                      ArithmeticExpr 减 TermExpr
 #   TermExpr ::= AtomicExpr |
 #                TermExpr 乘 AtomicExpr |
 #                TermExpr 除以 AtomicExpr |
-#                TermExpr 齐整整地除以 AtomicExpr
-#   AtomicExpr ::= ObjectExpr | AtomicExpr 的老 ObjectExpr | AtomicExpr 有几个坑
-#   ObjectExpr ::= LiteralExpr | VariableExpr | ParenExpr | CallExpr
+#                TermExpr 除以得毕挺 AtomicExpr
+#   AtomicExpr ::= LiteralExpr | VariableExpr | ParenExpr | CallExpr
 #   ParenExpr ::= （ Expr ）
-#   CallExpr ::= 整 Identifier |
-#                整 Identifier（ExprList）
+#   CallExpr ::= 白相 Identifier |
+#                白相 Identifier（ExprList）
 #   ExprList ::= Expr |
 #                Expr，ExprList
 
@@ -616,8 +572,8 @@ def ParseCallExpr(tokens):
         break
       _, tokens = ConsumeKeyword(KW_COMMA, tokens)
   return CallExpr(func.value, args), tokens
- 
-def ParseObjectExpr(tokens):
+
+def ParseAtomicExpr(tokens):
   """Returns (expr, remaining tokens)."""
 
   # Do we see an integer literal?
@@ -648,54 +604,8 @@ def ParseObjectExpr(tokens):
   call_expr, tokens = ParseCallExpr(tokens)
   if call_expr:
     return call_expr, tokens
-      
+
   return None, tokens
-
-def ParseAtomicExpr(tokens):
-  obj, tokens = ParseObjectExpr(tokens)
-  if not obj:
-    return None, tokens
-
-  expr = obj
-  while True:
-    pre_index_tokens = tokens
-
-    # Parse 的老
-    index, tokens = TryConsumeKeyword(KW_INDEX, tokens)
-    if index:
-      # Parse 大
-      greater, tokens = TryConsumeKeyword(KW_GREATER, tokens)
-      if greater:
-        # dongbei 数组是从1开始的。
-        expr = IndexExpr(expr, IntegerLiteralExpr(1))
-        continue
-
-      # Parse 幺
-      last, tokens = TryConsumeKeyword(KW_LAST, tokens)
-      if last:
-        # 0 - 1 = -1
-        expr = IndexExpr(expr, IntegerLiteralExpr(0))
-        continue
-
-      # Parse an ObjectExpr.
-      obj, tokens = ParseObjectExpr(tokens)
-      if obj:
-        expr = IndexExpr(expr, obj)
-      else:
-        # We have a trailing 的老 without an object expression to follow it.
-        tokens = pre_index_tokens
-        break
-
-    # Parse 有几个坑
-    length, tokens = TryConsumeKeyword(KW_LENGTH, tokens)
-    if length:
-      expr = LengthExpr(expr)
-      continue
-
-    # Found neither 的老 or 有几个坑 after the expression.
-    break
-
-  return expr, tokens
 
 def ParseTermExpr(tokens):
   factor, tokens = ParseAtomicExpr(tokens)
@@ -812,7 +722,7 @@ def ParseExpr(tokens):
     return nc_exprs[0], tokens
 
   return ConcatExpr(nc_exprs), tokens
-  
+
 def ParseExprFromStr(str):
   return ParseExpr(list(Tokenize(str)))
 
@@ -821,14 +731,14 @@ def ParseStmt(tokens):
 
   orig_tokens = tokens
 
-  # Parse 翠花，上
+  # Parse 阿庆，上
   imp, tokens = TryConsumeKeyword(KW_IMPORT, tokens)
   if imp:
     module, tokens = ConsumeTokenType(TK_IDENTIFIER, tokens)
     _, tokens = ConsumeKeyword(KW_PERIOD, tokens)
     return Statement(STMT_IMPORT, module), tokens
 
-  # Parse 开整：
+  # Parse 一道组特：
   begin, tokens = TryConsumeKeyword(KW_BEGIN, tokens)
   if begin:
     stmts, tokens = ParseStmts(tokens)
@@ -838,14 +748,14 @@ def ParseStmt(tokens):
     _, tokens = ConsumeKeyword(KW_PERIOD, tokens)
     return Statement(STMT_COMPOUND, stmts), tokens
 
-  # Parse 削：
+  # Parse 色特：
   delete, tokens = TryConsumeKeyword(KW_DELETE, tokens)
   if delete:
     var, tokens = ConsumeTokenType(TK_IDENTIFIER, tokens)
     _, tokens = ConsumeKeyword(KW_PERIOD, tokens)
     return Statement(STMT_DELETE, var), tokens
 
-  # Parse 唠唠：
+  # Parse 嘎讪胡：
   say, tokens = TryConsumeKeyword(KW_SAY, tokens)
   if say:
     colon, tokens = ConsumeKeyword(KW_COLON, tokens)
@@ -853,32 +763,20 @@ def ParseStmt(tokens):
     _, tokens = ConsumeKeyword(KW_PERIOD, tokens)
     return (Statement(STMT_SAY, expr), tokens)
 
-  # Parse 整
+  # Parse 白相
   call_expr, tokens = ParseCallExpr(tokens)
   if call_expr:
     _, tokens = ConsumeKeyword(KW_PERIOD, tokens)
     return Statement(STMT_CALL, call_expr), tokens
 
-  # Parse 滚犊子吧
+  # Parse 再会
   ret, tokens = TryConsumeKeyword(KW_RETURN, tokens)
   if ret:
     expr, tokens = ParseExpr(tokens)
     _, tokens = ConsumeKeyword(KW_PERIOD, tokens)
     return (Statement(STMT_RETURN, expr), tokens)
 
-  # Parse 接着磨叽
-  cont, tokens = TryConsumeKeyword(KW_CONTINUE, tokens)
-  if cont:
-    _, tokens = ConsumeKeyword(KW_PERIOD, tokens)
-    return Statement(STMT_CONTINUE, None), tokens
-
-  # Parse 尥蹶子
-  break_, tokens = TryConsumeKeyword(KW_BREAK, tokens)
-  if break_:
-    _, tokens = ConsumeKeyword(KW_PERIOD, tokens)
-    return Statement(STMT_BREAK, None), tokens
-
-  # Parse 寻思
+  # Parse 轧苗头
   check, tokens = TryConsumeKeyword(KW_CHECK, tokens)
   if check:
     expr, tokens = ParseExpr(tokens)
@@ -899,33 +797,20 @@ def ParseStmt(tokens):
 
   # Code below is for statements that start with an identifier.
 
-  # Parse 是活雷锋
+  # Parse 是则赤佬
   is_var, tokens = TryConsumeKeyword(KW_IS_VAR, tokens)
   if is_var:
     _, tokens = ConsumeKeyword(KW_PERIOD, tokens)
     return (Statement(STMT_VAR_DECL, id), tokens)
 
-  # Parse 都是活雷锋
-  is_list, tokens = TryConsumeKeyword(KW_IS_LIST, tokens)
-  if is_list:
-    _, tokens = ConsumeKeyword(KW_PERIOD, tokens)
-    return (Statement(STMT_LIST_VAR_DECL, id), tokens)
-
-  # Parse 装
+  # Parse 毛估估是
   become, tokens = TryConsumeKeyword(KW_BECOME, tokens)
   if become:
     expr, tokens = ParseExpr(tokens)
     _, tokens = ConsumeKeyword(KW_PERIOD, tokens)
     return (Statement(STMT_ASSIGN, (id, expr)), tokens)
 
-  # Parse 来了个
-  append, tokens = TryConsumeKeyword(KW_APPEND, tokens)
-  if append:
-    expr, tokens = ParseExpr(tokens)
-    _, tokens = ConsumeKeyword(KW_PERIOD, tokens)
-    return (Statement(STMT_APPEND, (id, expr)), tokens)
-
-  # Parse 走走
+  # Parse 扎台型
   inc, tokens = TryConsumeKeyword(KW_INC, tokens)
   if inc:
     _, tokens = ConsumeKeyword(KW_PERIOD, tokens)
@@ -933,7 +818,7 @@ def ParseStmt(tokens):
                       (id, IntegerLiteralExpr(1))),
             tokens)
 
-  # Parse 走X步
+  # Parse 扎X趟
   inc, tokens = TryConsumeKeyword(KW_INC_BY, tokens)
   if inc:
     expr, tokens = ParseExpr(tokens)
@@ -941,7 +826,7 @@ def ParseStmt(tokens):
     _, tokens = ConsumeKeyword(KW_PERIOD, tokens)
     return (Statement(STMT_INC_BY, (id, expr)), tokens)
 
-  # Parse 稍稍
+  # Parse 混腔势
   dec, tokens = TryConsumeKeyword(KW_DEC, tokens)
   if dec:
     _, tokens = ConsumeKeyword(KW_PERIOD, tokens)
@@ -949,7 +834,7 @@ def ParseStmt(tokens):
                       (id, IntegerLiteralExpr(1))),
             tokens)
 
-  # Parse 稍X步
+  # Parse 混X趟
   dec, tokens = TryConsumeKeyword(KW_DEC_BY, tokens)
   if dec:
     expr, tokens = ParseExpr(tokens)
@@ -957,7 +842,7 @@ def ParseStmt(tokens):
     _, tokens = ConsumeKeyword(KW_PERIOD, tokens)
     return (Statement(STMT_DEC_BY, (id, expr)), tokens)
 
-  # Parse 从...到...磨叽
+  # Parse 搞七捻三
   from_, tokens = TryConsumeKeyword(KW_FROM, tokens)
   if from_:
     from_expr, tokens = ParseExpr(tokens)
@@ -969,27 +854,7 @@ def ParseStmt(tokens):
     _, tokens = ConsumeKeyword(KW_PERIOD, tokens)
     return (Statement(STMT_LOOP, (id, from_expr, to_expr, stmts)), tokens)
 
-  # Parse 在...磨叽
-  in_, tokens = TryConsumeKeyword(KW_IN, tokens)
-  if in_:
-    range_expr, tokens = ParseExpr(tokens)
-    _, tokens = ConsumeKeyword(KW_LOOP, tokens)
-    stmts, tokens = ParseStmts(tokens)
-    _, tokens = ConsumeKeyword(KW_END_LOOP, tokens)
-    _, tokens = ConsumeKeyword(KW_PERIOD, tokens)
-    return (Statement(STMT_RANGE_LOOP, (id, range_expr, stmts)), tokens)
-
-  # Parse 从一而终磨叽 or the '1 Infinite Loop' 彩蛋
-  infinite_loop, tokens = TryConsumeKeyword(KW_1_INFINITE_LOOP, tokens)
-  if not infinite_loop:
-    infinite_loop, tokens = TryConsumeKeyword(KW_1_INFINITE_LOOP_EGG, tokens)
-  if infinite_loop:
-    stmts, tokens = ParseStmts(tokens)
-    _, tokens = ConsumeKeyword(KW_END_LOOP, tokens)
-    _, tokens = ConsumeKeyword(KW_PERIOD, tokens)
-    return Statement(STMT_INFINITE_LOOP, (id, stmts)), tokens
-
-  # Parse 咋整
+  # Parse 哪能组
   open_paren, tokens = TryConsumeKeyword(KW_OPEN_PAREN, tokens)
   if open_paren:
     params = []
@@ -1000,7 +865,7 @@ def ParseStmt(tokens):
       if close_paren:
         break
       _, tokens = ConsumeKeyword(KW_COMMA, tokens)
-        
+
     func_def, tokens = ConsumeToken(
         Keyword(KW_FUNC_DEF), tokens)
     stmts, tokens = ParseStmts(tokens)
@@ -1032,30 +897,20 @@ def ParseStmts(tokens):
 
 def TranslateStatementToPython(stmt, indent = ''):
   """Translates the statements to Python code, without trailing newline."""
-  
+
   if stmt.kind == STMT_VAR_DECL:
     var_token = stmt.value
     var = GetPythonVarName(var_token.value)
     return indent + '%s = None' % (var,)
-
-  if stmt.kind == STMT_LIST_VAR_DECL:
-    var_token = stmt.value
-    var = GetPythonVarName(var_token.value)
-    return indent + '%s = []' % (var,)
 
   if stmt.kind == STMT_ASSIGN:
     var_token, expr = stmt.value
     var = GetPythonVarName(var_token.value)
     return indent + '%s = %s' % (var, expr.ToPython())
 
-  if stmt.kind == STMT_APPEND:
-    var_token, expr = stmt.value
-    var = GetPythonVarName(var_token.value)
-    return indent + '%s.append(%s)' % (var, expr.ToPython())
-
   if stmt.kind == STMT_SAY:
     expr = stmt.value
-    return indent + '_db_append_output("%%s\\n" %% (_dongbei_str(%s),))' % (
+    return indent + '_db_append_output("%%s\\n" %% (_shanghai_str(%s),))' % (
         expr.ToPython(),)
 
   if stmt.kind == STMT_INC_BY:
@@ -1071,30 +926,9 @@ def TranslateStatementToPython(stmt, indent = ''):
   if stmt.kind == STMT_LOOP:
     var_token, from_val, to_val, stmts = stmt.value
     var = GetPythonVarName(var_token.value)
-    loop = indent + 'for %s in range(%s, (%s) + 1):' % (
+    loop = indent + 'for %s in range(%s, %s + 1):' % (
         var, from_val.ToPython(),
         to_val.ToPython())
-    for s in stmts:
-      loop += '\n' + TranslateStatementToPython(s, indent + '  ')
-    if not stmts:
-      loop += '\n' + indent + '  pass'
-    return loop
-
-  if stmt.kind == STMT_RANGE_LOOP:
-    var_token, range_expr, stmts = stmt.value
-    var = GetPythonVarName(var_token.value)
-    loop = indent + 'for %s in %s:' % (
-        var, range_expr.ToPython())
-    for s in stmts:
-      loop += '\n' + TranslateStatementToPython(s, indent + '  ')
-    if not stmts:
-      loop += '\n' + indent + '  pass'
-    return loop
-
-  if stmt.kind == STMT_INFINITE_LOOP:
-    var_token, stmts = stmt.value
-    var = GetPythonVarName(var_token.value)
-    loop = indent + 'for %s in _db_1_infinite_loop():' % (var,)
     for s in stmts:
       loop += '\n' + TranslateStatementToPython(s, indent + '  ')
     if not stmts:
@@ -1148,14 +982,8 @@ def TranslateStatementToPython(stmt, indent = ''):
   if stmt.kind == STMT_IMPORT:
     return indent + f'import {stmt.value.value}'
 
-  if stmt.kind == STMT_BREAK:
-    return indent + 'break'
+  sys.exit('我不懂 %s 语句哪能执行。' % (stmt.kind))
 
-  if stmt.kind == STMT_CONTINUE:
-    return indent + 'continue'
-
-  sys.exit('我不懂 %s 语句咋执行。' % (stmt.kind))
-  
 def TranslateTokensToPython(tokens):
   statements, tokens = ParseStmts(tokens)
   assert not tokens, ('多余符号：%s' % (tokens,))
@@ -1175,10 +1003,6 @@ def _db_append_output(s):
   global _db_output
   _db_output += s
 
-def _db_1_infinite_loop():
-  while True:
-    yield 1
-
 def Run(code):
   tokens = list(Tokenize(code))
   py_code = TranslateTokensToPython(tokens)
@@ -1188,7 +1012,7 @@ def Run(code):
   _db_output = ''
   # See https://stackoverflow.com/questions/871887/using-exec-with-recursive-functions
   # Use the same dictionary for local and global definitions.
-  # Needed for defining recursive dongbei functions.
+  # Needed for defining recursive shanghai functions.
   exec(py_code, globals(), globals())
   print('运行结果：')
   print('%s' % (_db_output,))
@@ -1203,3 +1027,4 @@ if __name__ == '__main__':
     with io.open(filepath, 'r', encoding='utf-8') as src_file:
       print('执行 %s ...' % (filepath,))
       Run(src_file.read())
+      #input('运行成功，按任意键退出。')
